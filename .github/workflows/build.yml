@@ -17,7 +17,7 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            # Step 2: Download Visual Studio Installer
+            # Step 2: Download Visual Studio Build Tools Installer
             - name: Download Visual Studio Build Tools Installer
               run: |
                   Invoke-WebRequest -Uri "https://aka.ms/vs/16/release/vs_buildtools.exe" -OutFile "vs_installer.exe"
@@ -35,7 +35,9 @@ jobs:
             # Step 5: Build the solution using devenv
             - name: Build the solution
               run: |
-                  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" D:\a\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions.sln /Build "Release"
+                  Start-Process -FilePath "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" `
+                  -ArgumentList '"D:\a\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions.sln" /Build Release' `
+                  -NoNewWindow -Wait
 
             # Step 6: Upload the MSI file generated from the setup project
             - name: Upload .msi as artifact
