@@ -19,18 +19,14 @@ jobs:
             - name: Setup MSBuild
               uses: microsoft/setup-msbuild@v1
               with:
-                  vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
+                  vs-version: "16.0" # Visual Studio version (16.0 for VS2019)
 
-            - name: Restore NuGet packages
+            - name: Build Setup Project
               run: |
-                  nuget restore ./WinformsGithubActions.sln
-
-            - name: Build the solution
-              run: |
-                  msbuild ./WinformsGithubActions.sln /p:Configuration=Release
+                  msbuild ./Setup/Setup.vdproj /p:Configuration=Release /p:Platform=x86
 
             - name: Upload .msi as artifact
               uses: actions/upload-artifact@v3
               with:
                   name: SetupMSI
-                  path: ./Setup/Release/WinformsGithubActions Installer.msi # Adjust this path if needed to match the actual output directory
+                  path: ./Setup/Release/*.msi # Adjust the path if necessary
