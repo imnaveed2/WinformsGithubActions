@@ -28,7 +28,7 @@ jobs:
 
             - name: Build WinformsGithubActions project
               run: |
-                  $env:MSBUILD_PATH &"./WinformsGithubActions/WinformsGithubActions.csproj" /p:Configuration=Release
+                  $env:MSBUILD_PATH & "./WinformsGithubActions/WinformsGithubActions.csproj" /p:Configuration=Release
 
             - name: Upload WinformsGithubActions.exe as artifact
               uses: actions/upload-artifact@v3
