@@ -1,8 +1,0 @@
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\bin\Debug\WinformsGithubActions.exe.config
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\bin\Debug\WinformsGithubActions.exe
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\bin\Debug\WinformsGithubActions.pdb
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\obj\Debug\WinformsGithubActions.Properties.Resources.resources
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\obj\Debug\WinformsGithubActions.csproj.GenerateResource.cache
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\obj\Debug\WinformsGithubActions.csproj.CoreCompileInputs.cache
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\obj\Debug\WinformsGithubActions.exe
-D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions\obj\Debug\WinformsGithubActions.pdb
