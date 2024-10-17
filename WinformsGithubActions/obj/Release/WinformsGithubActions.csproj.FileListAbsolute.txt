@@ -6,3 +6,4 @@ D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\obj\Release\WinformsG
 D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\obj\Release\WinformsGithubActions.csproj.CoreCompileInputs.cache
 D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\obj\Release\WinformsGithubActions.exe
 D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\obj\Release\WinformsGithubActions.pdb
+D:\naveed2\poc\WinformsGithubActions\WinformsGithubActions\obj\Release\WinformsGithubActions.csproj.AssemblyReference.cache
