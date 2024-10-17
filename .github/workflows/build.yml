@@ -28,7 +28,7 @@ jobs:
 
     - name: Build pdfize project
       run: |
-        & $env:MSBUILD_PATH ./pdfize/pdfize.csproj /p:Configuration=Release
+        $env:MSBUILD_PATH ./pdfize/pdfize.csproj /p:Configuration=Release
 
     - name: Upload PDFize.exe as artifact
       uses: actions/upload-artifact@v3
