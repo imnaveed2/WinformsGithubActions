@@ -21,6 +21,10 @@ jobs:
               with:
                   vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
 
+            - name: Restore NuGet packages
+              run: |
+                  nuget restore ./WinformsGithubActions/WinformsGithubActions.sln
+
             - name: Build the project
               run: |
                   msbuild ./WinformsGithubActions/WinformsGithubActions.csproj /p:Configuration=Release
