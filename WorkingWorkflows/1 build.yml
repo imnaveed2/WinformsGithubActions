@@ -1,4 +1,4 @@
-name: Build WinForms Application
+name: Build WinForms Application WinformsGithubActions
 
 on:
     push:
@@ -20,6 +20,10 @@ jobs:
               uses: microsoft/setup-msbuild@v1
               with:
                   vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
+
+            - name: Restore NuGet packages
+              run: |
+                  nuget restore ./WinformsGithubActions.sln
 
             - name: Build the project
               run: |

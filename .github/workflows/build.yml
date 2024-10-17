@@ -1,4 +1,4 @@
-name: Build WinForms Application
+name: Build WinForms Application WinformsGithubActions
 
 on:
     push:
