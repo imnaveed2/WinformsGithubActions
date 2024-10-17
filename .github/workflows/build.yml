@@ -33,4 +33,4 @@ jobs:
               uses: actions/upload-artifact@v3
               with:
                   name: SetupMSI
-                  path: ./Setup/Release/WinformsGithubActions Installer.msi # Adjust this path if needed to match the actual output directory
+                  path: ./Setup/Release/WinformsGithubActions.msi # Adjust this path if needed to match the actual output directory
