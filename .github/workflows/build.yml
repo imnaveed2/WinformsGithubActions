@@ -19,14 +19,14 @@ jobs:
             - name: Setup MSBuild
               uses: microsoft/setup-msbuild@v1
               with:
-                  vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
+                  vs-version: "16.0"  # Specify the Visual Studio version you need (16.0 for VS2019)
 
             - name: Build the solution
               run: |
-                  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" ./WinformsGithubActions.sln /Build "Release"
+                  & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" "D:\a\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions.sln" /Build "Release"
 
             - name: Upload .msi as artifact
               uses: actions/upload-artifact@v3
               with:
                   name: SetupMSI
-                  path: ./Setup/Release/*.msi # Adjust this path if needed to match the actual output directory
+                  path: ./Setup/Release/*.msi  # Adjust this path if needed to match the actual output directory
