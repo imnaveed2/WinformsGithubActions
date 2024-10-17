@@ -26,7 +26,7 @@ jobs:
                   msbuild ./WinformsGithubActions/WinformsGithubActions.csproj /p:Configuration=Release
 
             - name: Upload WinformsGithubActions.exe
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: WinformsGithubActions
                   path: ./WinformsGithubActions/bin/Release/WinformsGithubActions.exe
