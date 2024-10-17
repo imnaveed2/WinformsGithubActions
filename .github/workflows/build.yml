@@ -13,24 +13,28 @@ jobs:
         runs-on: windows-2019
 
         steps:
+            # Step 1: Checkout the code
             - name: Checkout code
               uses: actions/checkout@v2
 
-            - name: Setup MSBuild
-              uses: microsoft/setup-msbuild@v1
-              with:
-                  vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
+            # Step 2: Install Visual Studio Build Tools with Setup/Deployment Project Support
+            - name: Install Visual Studio 2019 with vdproj support
+              run: |
+                vs_installer.exe --quiet --wait --norestart --installPath "C:\BuildTools" --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.VC.CLI.Support --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --includeRecommended --includeOptional
 
+            # Step 3: Restore NuGet packages
             - name: Restore NuGet packages
               run: |
                   nuget restore ./WinformsGithubActions.sln
 
+            # Step 4: Build the solution using devenv (Visual Studio command line)
             - name: Build the solution
               run: |
-                  msbuild ./WinformsGithubActions.sln /p:Configuration=Release
+                  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" D:\a\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions.sln /Build "Release"
 
+            # Step 5: Upload the MSI file generated from the setup project
             - name: Upload .msi as artifact
               uses: actions/upload-artifact@v3
               with:
                   name: SetupMSI
-                  path: ./Setup/Release/WinformsGithubActions.msi # Adjust this path if needed to match the actual output directory
+                  path: ./Setup/Release/WinformsGithubActions.msi  # Adjust this path if needed to match the actual output directory
