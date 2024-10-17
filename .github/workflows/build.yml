@@ -1,4 +1,4 @@
-name: Build and Upload WinformsGithubActions Project
+name: Build WinForms Application
 
 on:
     push:
@@ -10,28 +10,23 @@ on:
 
 jobs:
     build:
-        runs-on: windows-2019
+        runs-on: windows-latest
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v2
 
-            - name: Install NuGet dependencies
-              run: nuget restore ./WinformsGithubActions.sln
-
-            - name: Find MSBuild Path
-              run: |
-                  echo "Finding MSBuild..."
-                  $msbuildPath = &"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
-                  echo "MSBuild found at: $msbuildPath"
-                  echo "##vso[task.setvariable variable=MSBUILD_PATH]$msbuildPath"
-
-            - name: Build WinformsGithubActions project
-              run: |
-                  $env:MSBUILD_PATH & "./WinformsGithubActions/WinformsGithubActions.csproj" /p:Configuration=Release
-
-            - name: Upload WinformsGithubActions.exe as artifact
-              uses: actions/upload-artifact@v3
+            - name: Setup MSBuild
+              uses: microsoft/setup-msbuild@v1
               with:
-                  name: WinformsGithubActions-exe
-                  path: WinformsGithubActions/bin/Release/WinformsGithubActions.exe
+                  vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
+
+            - name: Build the project
+              run: |
+                  msbuild ./WinformsGithubActions/WinformsGithubActions.csproj /p:Configuration=Release
+
+            - name: Upload WinformsGithubActions.exe
+              uses: actions/upload-artifact@v2
+              with:
+                  name: WinformsGithubActions
+                  path: ./WinformsGithubActions/bin/Release/WinformsGithubActions.exe
