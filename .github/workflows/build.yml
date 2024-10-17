@@ -25,9 +25,9 @@ jobs:
               run: |
                   nuget restore ./WinformsGithubActions.sln
 
-            - name: Build the solution
+            - name: Build Setup Project with devenv
               run: |
-                  msbuild ./WinformsGithubActions.sln /p:Configuration=Release
+                  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" ./WinformsGithubActions.sln /Build "Release" /Project ./Setup/Setup.vdproj
 
             - name: Upload .msi as artifact
               uses: actions/upload-artifact@v3
