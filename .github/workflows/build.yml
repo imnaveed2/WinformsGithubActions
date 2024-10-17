@@ -1,4 +1,4 @@
-name: Build WinForms Application WinformsGithubActions
+name: Build Setup Project
 
 on:
     push:
@@ -25,12 +25,12 @@ jobs:
               run: |
                   nuget restore ./WinformsGithubActions.sln
 
-            - name: Build the project
+            - name: Build the setup project
               run: |
-                  msbuild ./WinformsGithubActions/WinformsGithubActions.csproj /p:Configuration=Release
+                  msbuild ./Setup/Setup.vdproj /p:Configuration=Release
 
-            - name: Upload WinformsGithubActions.exe
+            - name: Upload .msi as artifact
               uses: actions/upload-artifact@v3
               with:
-                  name: WinformsGithubActions
-                  path: ./WinformsGithubActions/bin/Release/WinformsGithubActions.exe
+                  name: SetupMSI
+                  path: ./Setup/Release/*.msi # Adjust this path if needed to match the actual output directory
