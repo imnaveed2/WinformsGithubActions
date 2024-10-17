@@ -17,22 +17,22 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v2
 
-            # Step 2: Download the Visual Studio Installer
-            - name: Download Visual Studio Installer
+            # Step 2: Download Visual Studio Installer
+            - name: Download Visual Studio Build Tools Installer
               run: |
-                  curl -Lo vs_installer.exe https://aka.ms/vs/16/release/vs_buildtools.exe
+                  Invoke-WebRequest -Uri "https://aka.ms/vs/16/release/vs_buildtools.exe" -OutFile "vs_installer.exe"
 
-            # Step 3: Install Visual Studio with vdproj support
-            - name: Install Visual Studio 2019 with vdproj support
+            # Step 3: Install Visual Studio Build Tools with required components
+            - name: Install Visual Studio Build Tools
               run: |
-                  vs_installer.exe --quiet --wait --norestart --installPath "C:\BuildTools" --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.VC.CLI.Support --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --includeRecommended --includeOptional
+                  .\vs_installer.exe --quiet --wait --norestart --installPath "C:\BuildTools" --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.VC.CLI.Support --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --includeRecommended --includeOptional
 
             # Step 4: Restore NuGet packages
             - name: Restore NuGet packages
               run: |
                   nuget restore ./WinformsGithubActions.sln
 
-            # Step 5: Build the solution using devenv (Visual Studio command line)
+            # Step 5: Build the solution using devenv
             - name: Build the solution
               run: |
                   "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" D:\a\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions.sln /Build "Release"
