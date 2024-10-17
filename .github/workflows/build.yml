@@ -23,7 +23,7 @@ jobs:
 
             - name: Restore NuGet packages
               run: |
-                  nuget restore ./WinformsGithubActions/WinformsGithubActions.sln
+                  nuget restore ./WinformsGithubActions.sln
 
             - name: Build the project
               run: |
