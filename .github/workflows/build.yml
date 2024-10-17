@@ -27,7 +27,10 @@ jobs:
 
             - name: Build Setup Project with devenv
               run: |
-                  "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" ./WinformsGithubActions.sln /Build "Release" /Project ./Setup/Setup.vdproj
+                Start-Process -FilePath "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" `
+                -ArgumentList './WinformsGithubActions.sln', '/Build', 'Release', '/Project', './Setup/Setup.vdproj' `
+                -Wait
+              shell: pwsh
 
             - name: Upload .msi as artifact
               uses: actions/upload-artifact@v3
