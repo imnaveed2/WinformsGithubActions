@@ -1,0 +1,2 @@
+1 basic 
+2 is not building the setup project hence not uploading the msi file 

@@ -25,7 +25,7 @@ jobs:
 
       - name: Build the solution
         run: |
-          msbuild ./WinformsGithubActions.sln /p:Configuration=Release
+          "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ./WinformsGithubActions.sln /p:Configuration=Release
 
       - name: Build Setup project using devenv
         run: |
