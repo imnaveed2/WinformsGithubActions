@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Setup Project
         run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" ./Setup/Setup.vdproj /Build Release
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" ".\Setup\Setup.vdproj" /Build Release
 
       - name: Upload .msi as artifact
         uses: actions/upload-artifact@v3
