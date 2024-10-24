@@ -52,7 +52,7 @@ jobs:
       - name: Upload MSI Artifact
         run: |
           # Define the path to the MSI file (adjust the path as necessary)
-          $msiPath = "${{ github.workspace }}\Setup\Release\YourSetupFile.msi" # Replace with the actual MSI file name
+          $msiPath = "${{ github.workspace }}\Setup\Release\Setup.msi" # Replace with the actual MSI file name
 
           # Check if the MSI file exists
           if (Test-Path $msiPath) {
