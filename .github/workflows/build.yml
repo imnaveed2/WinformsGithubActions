@@ -59,6 +59,17 @@ jobs:
               & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.CoreEditor -property installationPath | ForEach-Object {
                   choco install visualstudio2019enterprise --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --quiet --norestart"
               }
+
+              # Check if devenv.exe is present after installation
+              if (Test-Path "$vsPath\Common7\IDE\devenv.exe") {
+                  echo "devenv.exe installed successfully at $vsPath\Common7\IDE\devenv.exe"
+              } else {
+                  echo "devenv.exe still not found. Listing installed components..."
+                  & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -products * -format json | ConvertFrom-Json | ForEach-Object {
+                      echo "Installed component: $($_.name)"
+                  }
+                  exit 1 # Exit with error if devenv.exe is not found
+              }
           }
 
       - name: Build Setup Project
