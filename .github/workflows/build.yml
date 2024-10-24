@@ -33,6 +33,9 @@ jobs:
 
           # Check if the Setup.vdproj file exists
           if (Test-Path $setupProjectPath) {
+              Write-Host "Found Setup.vdproj at: $setupProjectPath"
+              Write-Host "Using devenv.exe at: $devenvPath" # Debug output for devenvPath
+
               # Build the setup project using devenv.exe
               Start-Process -FilePath $devenvPath -ArgumentList $setupProjectPath, '/build', 'Release' -NoNewWindow -Wait
           } else {
