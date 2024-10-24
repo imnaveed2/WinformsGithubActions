@@ -10,21 +10,25 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019  # Changed to windows-2019
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Visual Studio
+      - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
         with:
           vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
 
-      - name: Install Visual Studio components
+      - name: Check for Visual Studio
         run: |
-          choco install visualstudio2019community --version 16.0 --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional"
-          # Adjust the above command for your edition and required components
+          if [ ! -f "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" ]; then
+            echo "Visual Studio not found, installing..."
+            choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional"
+          else
+            echo "Visual Studio is already installed."
+          fi
 
       - name: Restore NuGet packages
         run: |
