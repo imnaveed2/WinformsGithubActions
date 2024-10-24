@@ -1,4 +1,4 @@
-name: Do Nothing
+name: Check Visual Studio Version
 
 on:
   push:
@@ -6,9 +6,32 @@ on:
       - main
 
 jobs:
-  do-nothing:
+  check-visual-studio:
     runs-on: windows-2019
 
     steps:
-      - name: Do Nothing Step
-        run: echo "This step does nothing."
+      - name: Check Visual Studio Version
+        run: |
+          # Define the path to vswhere
+          $vsInstallPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+
+          # Check if vswhere exists
+          if (Test-Path $vsInstallPath) {
+              # Get the installed Visual Studio versions in JSON format
+              $vsInfo = & $vsInstallPath -products * -format json
+
+              # Convert JSON output to PowerShell objects
+              $vsVersions = $vsInfo | ConvertFrom-Json
+
+              # Check if any versions are found
+              if ($vsVersions) {
+                  # Output the version and path of each installation
+                  foreach ($version in $vsVersions) {
+                      Write-Host "Version: $($version.version), Path: $($version.installationPath)"
+                  }
+              } else {
+                  Write-Host "No Visual Studio installations found."
+              }
+          } else {
+              Write-Host "vswhere.exe not found. Visual Studio might not be installed."
+          }
