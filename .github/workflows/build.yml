@@ -48,13 +48,17 @@ jobs:
           msbuild ./WinformsGithubActions.sln /p:Configuration=Release
 
       - name: Check for devenv.exe
+        id: check_devenv
         run: |
           $vsPath = "${{ env.vs_installation_path }}"
           if (Test-Path "$vsPath\Common7\IDE\devenv.exe") {
               echo "devenv.exe found at $vsPath\Common7\IDE\devenv.exe"
           } else {
               echo "devenv.exe not found at $vsPath\Common7\IDE\devenv.exe"
-              exit 1 # Exit with error if devenv.exe is not found
+              echo "Installing necessary components for devenv.exe in the existing Visual Studio installation..."
+              & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.CoreEditor -property installationPath | ForEach-Object {
+                  choco install visualstudio2019enterprise --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --quiet --norestart"
+              }
           }
 
       - name: Build Setup Project
