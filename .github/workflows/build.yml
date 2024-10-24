@@ -56,8 +56,10 @@ jobs:
           } else {
               echo "devenv.exe not found at $vsPath\Common7\IDE\devenv.exe"
               echo "Installing necessary components for devenv.exe in the existing Visual Studio installation..."
-              & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.CoreEditor -property installationPath | ForEach-Object {
-                  & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Workload.ManagedDesktop -property installationPath
+
+              # Install the Desktop Development with .NET workload
+              & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath | ForEach-Object {
+                  choco install visualstudio2019enterprise --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --quiet --norestart"
               }
 
               # Check if devenv.exe is present after installation
