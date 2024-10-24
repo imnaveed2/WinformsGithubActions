@@ -1,47 +1,36 @@
 name: Build Setup Project
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
 
 jobs:
-  build:
-    runs-on: windows-2019
+    build:
+        runs-on: windows-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
 
-      - name: Download Visual Studio Build Tools Installer
-        run: |
-          Invoke-WebRequest -Uri "https://aka.ms/vs/16/release/vs_buildtools.exe" -OutFile "vs_installer.exe"
+            - name: Setup MSBuild
+              uses: microsoft/setup-msbuild@v1
+              with:
+                  vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
 
-      - name: Install Visual Studio Installer Projects Extension
-        run: |
-          .\vs_installer.exe --quiet --wait --norestart `
-          --installPath "C:\BuildTools" `
-          --add Microsoft.VisualStudio.ComponentGroup.VC.Tools.x86.x64 `
-          --add Microsoft.VisualStudio.Component.VC.CLI.Support `
-          --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools `
-          --add Component.Microsoft.VisualStudio.RazorExtension `
-          --add Microsoft.VisualStudio.Component.VC.Tools.ARM64
+            - name: Restore NuGet packages
+              run: |
+                  nuget restore ./WinformsGithubActions.sln
 
-      - name: Restore NuGet packages
-        run: |
-          nuget restore ./WinformsGithubActions.sln
+            - name: Build the solution
+              run: |
+                  msbuild ./WinformsGithubActions.sln /p:Configuration=Release
 
-      - name: Build the Setup Project
-        run: |
-          Start-Process -FilePath "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" `
-          -ArgumentList '"D:\a\WinformsGithubActions\WinformsGithubActions\WinformsGithubActions.sln" /Build "Release|Any CPU"' `
-          -Verb RunAs -NoNewWindow -Wait
-
-      - name: Upload .msi as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: SetupMSI
-          path: ./Setup/Release/WinformsGithubActions.msi
+            - name: Upload .msi as artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: SetupMSI
+                  path: ./Setup/Release/WinformsGithubActions Installer.msi # Adjust this path if needed to match the actual output directory
