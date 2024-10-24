@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019  # Changed to windows-2019
+    runs-on: windows-2019  # Using windows-2019 runner
 
     steps:
       - name: Checkout code
@@ -21,15 +21,28 @@ jobs:
         with:
           vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
 
-      - name: Check for Visual Studio
+      - name: Install Required Visual Studio Components
         run: |
-          if (-Not (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe")) {
-              Write-Host "Visual Studio not found, installing..."
-              choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional"
-          } else {
-              Write-Host "Visual Studio is already installed."
+          # Check if the required components are installed
+          $requiredComponents = @(
+              "Microsoft.VisualStudio.Workload.ManagedDesktop"  # Add any other required components here
+          )
+          
+          $missingComponents = @()
+          foreach ($component in $requiredComponents) {
+              $installed = & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\vswhere.exe" -products * -requires $component -property installLocation
+              if (-Not $installed) {
+                  $missingComponents += $component
+              }
           }
-        shell: pwsh  # Specify PowerShell as the shell
+
+          if ($missingComponents.Count -gt 0) {
+              Write-Host "Missing components found: $($missingComponents -join ', '), installing..."
+              choco install visualstudio2019community --params "--add $($missingComponents -join ',') --includeRecommended --includeOptional"
+          } else {
+              Write-Host "All required components are already installed."
+          }
+        shell: pwsh
 
       - name: Restore NuGet packages
         run: |
