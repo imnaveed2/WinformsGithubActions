@@ -1,36 +1,45 @@
 name: Build Setup Project
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-    build:
-        runs-on: windows-latest
+  build:
+    runs-on: windows-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Setup MSBuild
-              uses: microsoft/setup-msbuild@v1
-              with:
-                  vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
+      - name: Setup Visual Studio
+        uses: microsoft/setup-msbuild@v1
+        with:
+          vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
 
-            - name: Restore NuGet packages
-              run: |
-                  nuget restore ./WinformsGithubActions.sln
+      - name: Install Visual Studio components
+        run: |
+          choco install visualstudio2019community --version 16.0 --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional"
+          # Adjust the above command for your edition and required components
 
-            - name: Build the solution
-              run: |
-                  msbuild ./WinformsGithubActions.sln /p:Configuration=Release
+      - name: Restore NuGet packages
+        run: |
+          nuget restore ./WinformsGithubActions.sln
 
-            - name: Upload .msi as artifact
-              uses: actions/upload-artifact@v3
-              with:
-                  name: SetupMSI
-                  path: ./Setup/Release/WinformsGithubActions Installer.msi # Adjust this path if needed to match the actual output directory
+      - name: Build the solution
+        run: |
+          msbuild ./WinformsGithubActions.sln /p:Configuration=Release
+
+      - name: Build Setup Project
+        run: |
+          "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" ./Setup/Setup.vdproj /Build Release
+
+      - name: Upload .msi as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: SetupMSI
+          path: ./Setup/Release/WinformsGithubActions Installer.msi # Adjust this path if needed to match the actual output directory
