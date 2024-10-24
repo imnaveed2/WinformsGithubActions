@@ -18,7 +18,10 @@ jobs:
           # Get the installed Visual Studio versions
           $vsInstallPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
           if (Test-Path $vsInstallPath) {
-              & $vsInstallPath -products * -format json | ConvertFrom-Json | Select-Object -ExpandProperty installation | Select-Object -Property version, path
+              # Run vswhere and output the full JSON result for debugging
+              $vsInfo = & $vsInstallPath -products * -format json
+              Write-Host "VSWhere Output: $vsInfo"  # Output the raw JSON result
+              $vsInfo | ConvertFrom-Json | Select-Object -ExpandProperty installation | Select-Object -Property version, path
           } else {
               Write-Host "vswhere.exe not found. Visual Studio might not be installed."
           }
