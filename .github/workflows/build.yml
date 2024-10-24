@@ -16,22 +16,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Chocolatey
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force; 
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; 
-          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+        with:
+          vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
 
-      - name: Install Visual Studio 2019 Community
+      - name: Check for Visual Studio
+        id: check_vs
         run: |
-          choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional --quiet --norestart"
-
-      - name: Set Visual Studio Path
-        id: set_vspath
-        run: |
-          $vsPath = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
-          echo "vs_installation_path=$vsPath" >> $GITHUB_ENV
-          echo "Visual Studio installed at: $vsPath"
+          if (!(Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe")) {
+            echo "vswhere.exe not found, installing Visual Studio..."
+            choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional --quiet --norestart"
+          } else {
+            $vsInstance = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+            if ($null -eq $vsInstance) {
+              echo "Visual Studio not found, installing..."
+              choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional --quiet --norestart"
+            } else {
+              echo "Visual Studio is already installed at: $vsInstance"
+              # Set the installation path for later use
+              echo "vs_installation_path=$vsInstance" >> $GITHUB_ENV
+            }
+          }
 
       - name: Restore NuGet packages
         run: |
@@ -39,11 +45,12 @@ jobs:
 
       - name: Build the solution
         run: |
-          & "$env:vs_installation_path\MSBuild\Current\Bin\MSBuild.exe" ./WinformsGithubActions.sln /p:Configuration=Release
+          msbuild ./WinformsGithubActions.sln /p:Configuration=Release
 
       - name: Build Setup Project
         run: |
-          & "$env:vs_installation_path\Common7\IDE\devenv.exe" ".\Setup\Setup.vdproj" /Build Release
+          $vsPath = "${{ env.vs_installation_path }}"
+          & "$vsPath\Common7\IDE\devenv.exe" ".\Setup\Setup.vdproj" /Build Release
 
       - name: Upload .msi as artifact
         uses: actions/upload-artifact@v3
