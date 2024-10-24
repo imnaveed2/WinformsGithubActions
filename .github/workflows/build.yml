@@ -47,6 +47,16 @@ jobs:
         run: |
           msbuild ./WinformsGithubActions.sln /p:Configuration=Release
 
+      - name: Check for devenv.exe
+        run: |
+          $vsPath = "${{ env.vs_installation_path }}"
+          if (Test-Path "$vsPath\Common7\IDE\devenv.exe") {
+              echo "devenv.exe found at $vsPath\Common7\IDE\devenv.exe"
+          } else {
+              echo "devenv.exe not found at $vsPath\Common7\IDE\devenv.exe"
+              exit 1 # Exit with error if devenv.exe is not found
+          }
+
       - name: Build Setup Project
         run: |
           $vsPath = "${{ env.vs_installation_path }}"
