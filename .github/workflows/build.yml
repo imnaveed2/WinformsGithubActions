@@ -31,5 +31,11 @@ jobs:
           # Define the path to the Setup.vdproj file
           $setupProjectPath = "${{ github.workspace }}\Setup\Setup.vdproj"
 
-          # Build the setup project using devenv.exe
-          & $devenvPath $setupProjectPath /build Release
+          # Check if the Setup.vdproj file exists
+          if (Test-Path $setupProjectPath) {
+              # Build the setup project using devenv.exe
+              Start-Process -FilePath $devenvPath -ArgumentList $setupProjectPath, '/build', 'Release' -NoNewWindow -Wait
+          } else {
+              Write-Host "Setup.vdproj file not found at: $setupProjectPath"
+              exit 1 # Exit if the Setup.vdproj file is not found
+          }
