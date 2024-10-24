@@ -1,4 +1,4 @@
-name: Check Visual Studio Workload
+name: Check Visual Studio Installation
 
 on:
   push:
@@ -6,40 +6,18 @@ on:
       - main
 
 jobs:
-  check-visual-studio-workload:
+  check-devenv:
     runs-on: windows-2019
 
     steps:
-      - name: Check Visual Studio Workload
+      - name: Check if devenv.exe is installed
         run: |
-          # Define the path to vswhere
-          $vsInstallPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          # Define the path to devenv.exe
+          $devenvPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.exe"
 
-          # Check if vswhere exists
-          if (Test-Path $vsInstallPath) {
-              # Get the installed Visual Studio versions in JSON format
-              $vsInfo = & $vsInstallPath -products * -format json
-
-              # Convert JSON output to PowerShell objects
-              $vsVersions = $vsInfo | ConvertFrom-Json
-
-              # Check if any versions are found
-              if ($vsVersions) {
-                  foreach ($version in $vsVersions) {
-                      Write-Host "Version: $($version.version), Path: $($version.installationPath)"
-
-                      # Check for installed workloads
-                      $workloadInfo = & $vsInstallPath -products * -format json -requires Microsoft.VisualStudio.Workload.ManagedDesktop
-
-                      if ($workloadInfo) {
-                          Write-Host "The 'Desktop development with .NET' workload is installed."
-                      } else {
-                          Write-Host "The 'Desktop development with .NET' workload is NOT installed."
-                      }
-                  }
-              } else {
-                  Write-Host "No Visual Studio installations found."
-              }
+          # Check if devenv.exe exists
+          if (Test-Path $devenvPath) {
+              Write-Host "devenv.exe is installed at: $devenvPath"
           } else {
-              Write-Host "vswhere.exe not found. Visual Studio might not be installed."
+              Write-Host "devenv.exe is NOT installed."
           }
