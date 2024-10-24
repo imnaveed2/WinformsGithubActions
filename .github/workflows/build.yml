@@ -22,6 +22,7 @@ jobs:
           vs-version: "16.0" # Specify the Visual Studio version you need (16.0 for VS2019)
 
       - name: Check for Visual Studio
+        id: check_vs
         run: |
           if (!(Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe")) {
             echo "vswhere.exe not found, installing Visual Studio..."
@@ -34,7 +35,7 @@ jobs:
             } else {
               echo "Visual Studio is already installed at: $vsInstance"
               # Set the installation path for later use
-              Write-Host "##[set-output name=vs_installation_path;]$vsInstance"
+              echo "vs_installation_path=$vsInstance" >> $GITHUB_ENV
             }
           }
 
@@ -48,7 +49,7 @@ jobs:
 
       - name: Build Setup Project
         run: |
-          $vsPath = "$(vs_installation_path)"
+          $vsPath = "${{ env.vs_installation_path }}"
           & "$vsPath\Common7\IDE\devenv.exe" ".\Setup\Setup.vdproj" /Build Release
 
       - name: Upload .msi as artifact
