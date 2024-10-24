@@ -1,4 +1,4 @@
-name: Check Visual Studio Version
+name: Check Visual Studio Workload
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
-  check-visual-studio:
+  check-visual-studio-workload:
     runs-on: windows-2019
 
     steps:
-      - name: Check Visual Studio Version
+      - name: Check Visual Studio Workload
         run: |
           # Define the path to vswhere
           $vsInstallPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
@@ -25,9 +25,18 @@ jobs:
 
               # Check if any versions are found
               if ($vsVersions) {
-                  # Output the version and path of each installation
                   foreach ($version in $vsVersions) {
                       Write-Host "Version: $($version.version), Path: $($version.installationPath)"
+
+                      # Check for installed workloads
+                      $workloads = $version.installationPath + '\Common7\IDE\devenv.exe' + ' /Log'
+                      $workloadInfo = & $workloads
+
+                      if ($workloadInfo -match "Microsoft.VisualStudio.Workload.ManagedDesktop") {
+                          Write-Host "The 'Desktop development with .NET' workload is installed."
+                      } else {
+                          Write-Host "The 'Desktop development with .NET' workload is NOT installed."
+                      }
                   }
               } else {
                   Write-Host "No Visual Studio installations found."
