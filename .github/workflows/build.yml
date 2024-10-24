@@ -29,10 +29,9 @@ jobs:
                       Write-Host "Version: $($version.version), Path: $($version.installationPath)"
 
                       # Check for installed workloads
-                      $workloads = $version.installationPath + '\Common7\IDE\devenv.exe' + ' /Log'
-                      $workloadInfo = & $workloads
+                      $workloadInfo = & $vsInstallPath -products * -format json -requires Microsoft.VisualStudio.Workload.ManagedDesktop
 
-                      if ($workloadInfo -match "Microsoft.VisualStudio.Workload.ManagedDesktop") {
+                      if ($workloadInfo) {
                           Write-Host "The 'Desktop development with .NET' workload is installed."
                       } else {
                           Write-Host "The 'Desktop development with .NET' workload is NOT installed."
