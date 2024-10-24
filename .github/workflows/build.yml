@@ -48,3 +48,25 @@ jobs:
               Write-Host "Setup.vdproj file not found at: $setupProjectPath"
               exit 1 # Exit if the Setup.vdproj file is not found
           }
+
+      - name: Upload MSI Artifact
+        run: |
+          # Define the path to the MSI file (adjust the path as necessary)
+          $msiPath = "${{ github.workspace }}\Setup\Release\YourSetupFile.msi" # Replace with the actual MSI file name
+
+          # Check if the MSI file exists
+          if (Test-Path $msiPath) {
+              Write-Host "Found MSI file at: $msiPath"
+          } else {
+              Write-Host "MSI file not found at: $msiPath"
+              exit 1 # Exit if the MSI file is not found
+          }
+          
+          # Upload the MSI file as an artifact
+          echo "::set-output name=msi-path::$msiPath"
+          
+      - name: Upload MSI to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: setup-msi
+          path: ${{ steps.upload-msi.outputs.msi-path }}
