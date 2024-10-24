@@ -27,12 +27,14 @@ jobs:
             echo "vswhere.exe not found, installing Visual Studio..."
             choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional --quiet --norestart"
           } else {
-            $vsInstance = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild
+            $vsInstance = & "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
             if ($null -eq $vsInstance) {
               echo "Visual Studio not found, installing..."
               choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional --quiet --norestart"
             } else {
-              echo "Visual Studio is already installed."
+              echo "Visual Studio is already installed at: $vsInstance"
+              # Set the installation path for later use
+              Write-Host "##[set-output name=vs_installation_path;]$vsInstance"
             }
           }
 
@@ -46,7 +48,8 @@ jobs:
 
       - name: Build Setup Project
         run: |
-          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" ".\Setup\Setup.vdproj" /Build Release
+          $vsPath = "$(vs_installation_path)"
+          & "$vsPath\Common7\IDE\devenv.exe" ".\Setup\Setup.vdproj" /Build Release
 
       - name: Upload .msi as artifact
         uses: actions/upload-artifact@v3
