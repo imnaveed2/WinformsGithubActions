@@ -10,29 +10,41 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest # Use the latest GitHub Actions runner with Visual Studio installed
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Visual Studio Build Tools
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+        with:
+          vs-version: "16.0" # Specify Visual Studio version (16.0 for 2019, 17.0 for 2022)
+
+      - name: Find MSBuild
+        id: find-msbuild
         run: |
-          choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest --includeRecommended --includeOptional" --no-progress
+          echo "Finding MSBuild..."
+          if (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe") {
+              echo "MSBuild found at: ${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
+              echo "MSBUILD_PATH=${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" >> $GITHUB_ENV
+          } elseif (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe") {
+              echo "MSBuild found at: ${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
+              echo "MSBUILD_PATH=${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" >> $GITHUB_ENV
+          } else {
+              echo "MSBuild not found!"
+              exit 1
+          }
 
       - name: Restore NuGet packages
         run: nuget restore ./WinformsGithubActions.sln
 
       - name: Build the solution
         run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ./WinformsGithubActions.sln /p:Configuration=Release
-
-      - name: Build Setup project using devenv
-        run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" D:\a\WinformsGithubActions\WinformsGithubActions.sln /Build "Release"
+          & "${{ env.MSBUILD_PATH }}" ./WinformsGithubActions.sln /p:Configuration=Release
 
       - name: Upload .msi as artifact
         uses: actions/upload-artifact@v3
         with:
           name: SetupMSI
-          path: ./Setup/Release/*.msi  # Adjust this path if needed to match the actual output directory
+          path: ./Setup/Release/WinformsGithubActions Installer.msi # Ensure this matches your output path
