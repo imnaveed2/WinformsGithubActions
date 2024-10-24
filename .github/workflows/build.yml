@@ -1,4 +1,4 @@
-name: Check Visual Studio Installation
+name: Check Visual Studio Installation and Build Setup Project
 
 on:
   push:
@@ -23,4 +23,13 @@ jobs:
               Write-Host "devenv.exe is installed at: $devenvPath"
           } else {
               Write-Host "devenv.exe is NOT installed."
+              exit 1 # Exit the job if devenv is not found
           }
+
+      - name: Build Setup Project
+        run: |
+          # Define the path to the Setup.vdproj file
+          $setupProjectPath = "${{ github.workspace }}\Setup\Setup.vdproj"
+
+          # Build the setup project using devenv.exe
+          & $devenvPath $setupProjectPath /build Release
