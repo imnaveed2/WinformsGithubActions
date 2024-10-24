@@ -23,12 +23,13 @@ jobs:
 
       - name: Check for Visual Studio
         run: |
-          if [ ! -f "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" ]; then
-            echo "Visual Studio not found, installing..."
-            choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional"
-          else
-            echo "Visual Studio is already installed."
-          fi
+          if (-Not (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe")) {
+              Write-Host "Visual Studio not found, installing..."
+              choco install visualstudio2019community --params "--add Microsoft.VisualStudio.Workload.ManagedDesktop --includeRecommended --includeOptional"
+          } else {
+              Write-Host "Visual Studio is already installed."
+          }
+        shell: pwsh  # Specify PowerShell as the shell
 
       - name: Restore NuGet packages
         run: |
