@@ -14,19 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Advanced Installer
-        if: ${{ !env.ADVANCED_INSTALLER_PATH }}
-        run: |
-          choco install advanced-installer --version=20.3.1 --yes
-          echo "ADVANCED_INSTALLER_PATH=C:\Program Files (x86)\Caphyon\Advanced Installer 20.3.1\bin\x86" >> $GITHUB_ENV
+      - name: Install Advanced Installer
+        run: choco install advanced-installer --version=20.3.1 --yes
 
-      - name: Cache Advanced Installer dependencies
-        uses: actions/cache@v3
-        with:
-          path: AdvanceSetup/AdvanceSetup-cache
-          key: ${{ runner.os }}-advanced-installer-cache
-          restore-keys: |
-            ${{ runner.os }}-advanced-installer-cache
+      - name: Locate Advanced Installer Path
+        id: locate-ai
+        run: |
+          $installerPath = Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer*" -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          echo "ADVANCED_INSTALLER_PATH=$installerPath\bin\x86" >> $GITHUB_ENV
 
       - name: Build MSI using Advanced Installer
         run: |
