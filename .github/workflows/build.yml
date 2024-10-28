@@ -17,15 +17,20 @@ jobs:
       - name: Install Advanced Installer
         run: choco install advanced-installer --version=20.3.1 --yes
 
-      - name: Locate Advanced Installer Path
-        id: locate-ai
+      - name: Verify Advanced Installer Path
+        id: verify-path
         run: |
-          $installerPath = Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer*" -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-          echo "ADVANCED_INSTALLER_PATH=$installerPath\bin\x86" >> $GITHUB_ENV
+          $aiPath = Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer*" -Directory | Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName -First 1
+          if (!(Test-Path "$aiPath\bin\x86\AdvancedInstaller.com")) {
+            throw "AdvancedInstaller.com not found at expected path: $aiPath\bin\x86"
+          }
+          echo "ADVANCED_INSTALLER_PATH=$aiPath\bin\x86" >> $GITHUB_ENV
+          Write-Output "Advanced Installer path confirmed: $aiPath\bin\x86"
 
       - name: Build MSI using Advanced Installer
         run: |
           $env:Path += ";$env:ADVANCED_INSTALLER_PATH"
+          Write-Output "Using AdvancedInstaller.com from: $env:ADVANCED_INSTALLER_PATH"
           &"$env:ADVANCED_INSTALLER_PATH\AdvancedInstaller.com" /build AdvanceSetup/AdvanceSetup.aip
 
       - name: Upload AdvanceSetup.msi artifact
