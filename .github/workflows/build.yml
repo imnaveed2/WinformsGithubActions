@@ -17,29 +17,10 @@ jobs:
       - name: Install Advanced Installer
         run: choco install advanced-installer --version=20.3.1 --yes
 
-      - name: Locate and Set Advanced Installer Path
-        id: locate-ai
+      - name: Set Advanced Installer Path Directly
         run: |
-          # Log to inspect directories and confirm Advanced Installer installation
-          Write-Output "Checking 'C:\\Program Files (x86)\\Caphyon' directory contents:"
-          Get-ChildItem "C:\Program Files (x86)\Caphyon" -Recurse | Write-Output
-
-          # Locate the Advanced Installer directory
-          $installerDir = Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer*" -Directory | Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName -First 1
-          if ($null -eq $installerDir) {
-            Write-Error "Advanced Installer directory not found in expected location."
-            exit 1
-          }
-
-          # Log the directory identified and confirm if AdvancedInstaller.com exists
-          Write-Output "Located Advanced Installer directory: $installerDir"
-          if (Test-Path "$installerDir\bin\x86\AdvancedInstaller.com") {
-            Write-Output "AdvancedInstaller.com located at $installerDir\bin\x86"
-            echo "ADVANCED_INSTALLER_PATH=$installerDir\bin\x86" >> $GITHUB_ENV
-          } else {
-            Write-Error "AdvancedInstaller.com not found in expected path: $installerDir\bin\x86"
-            exit 1
-          }
+          # Directly set the path to the known Advanced Installer location
+          echo "ADVANCED_INSTALLER_PATH=C:\Program Files (x86)\Caphyon\Advanced Installer 20.3.1\bin\x86" >> $GITHUB_ENV
 
       - name: Confirm Path Environment Variable and Directory Contents
         run: |
