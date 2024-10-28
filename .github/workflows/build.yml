@@ -17,30 +17,25 @@ jobs:
       - name: Install Advanced Installer
         run: choco install advanced-installer --version=20.3.1 --yes
 
-      - name: Set and Confirm Advanced Installer Path
-        shell: pwsh
-        run: |
-          # Set ADVANCED_INSTALLER_PATH directly in the environment
-          $env:ADVANCED_INSTALLER_PATH = 'C:\Program Files (x86)\Caphyon\Advanced Installer 20.3.1\bin\x86'
-          Write-Output "ADVANCED_INSTALLER_PATH set to: $env:ADVANCED_INSTALLER_PATH"
-
-          # Confirm if AdvancedInstaller.com exists
-          if (-not (Test-Path "$env:ADVANCED_INSTALLER_PATH\AdvancedInstaller.com")) {
-            Write-Error "AdvancedInstaller.com executable not found in path: $env:ADVANCED_INSTALLER_PATH"
-            exit 1
-          }
-          
-          # Print directory contents for verification
-          Write-Output "Contents of $env:ADVANCED_INSTALLER_PATH:"
-          Get-ChildItem "$env:ADVANCED_INSTALLER_PATH" | Write-Output
-
       - name: Build MSI using Advanced Installer
         shell: pwsh
         run: |
-          # Use AdvancedInstaller.com to build the project
-          $env:Path += ";$env:ADVANCED_INSTALLER_PATH"
-          Write-Output "Using AdvancedInstaller.com from: $env:ADVANCED_INSTALLER_PATH"
-          & "$env:ADVANCED_INSTALLER_PATH\AdvancedInstaller.com" /build AdvanceSetup/AdvanceSetup.aip
+          # Define the direct path to AdvancedInstaller.com
+          $advancedInstallerPath = 'C:\Program Files (x86)\Caphyon\Advanced Installer 20.3.1\bin\x86\AdvancedInstaller.com'
+          
+          # Confirm AdvancedInstaller.com exists at this path
+          if (-not (Test-Path $advancedInstallerPath)) {
+            Write-Error "AdvancedInstaller.com executable not found in path: $advancedInstallerPath"
+            exit 1
+          }
+
+          # Display contents of the Advanced Installer directory for debugging
+          Write-Output "Contents of Advanced Installer directory:"
+          Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer 20.3.1\bin\x86" | Write-Output
+
+          # Run the build command directly using the full path
+          Write-Output "Using AdvancedInstaller.com from: $advancedInstallerPath"
+          & "$advancedInstallerPath" /build AdvanceSetup/AdvanceSetup.aip
 
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
