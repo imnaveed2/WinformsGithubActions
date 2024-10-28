@@ -27,7 +27,7 @@
       <Name>WinformsGithubActions</Name>
       <Project>{d05dc0ca-efec-4dcf-89f4-0b0223dbbf65}</Project>
       <Private>True</Private>
-      <OutputsToImport>PrimaryOutput</OutputsToImport>
+      <OutputsToImport>PrimaryOutput;References;ContentOutput;DocumentationOutput;LocalizedResourcesOutput;SymbolsOutput;ComTypeLibraryOutput</OutputsToImport>
     </ProjectReference>
   </ItemGroup>
   <Target Name="Build">
