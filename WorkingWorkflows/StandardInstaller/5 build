@@ -1,0 +1,72 @@
+name: Check Visual Studio Installation and Build Setup Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-devenv:
+    runs-on: windows-2019
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Check if devenv.exe is installed
+        run: |
+          # Define the path to devenv.exe
+          $devenvPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.exe"
+          
+          # Output the expected path for debugging
+          Write-Host "Expected path to devenv.exe: $devenvPath"
+
+          # Check if devenv.exe exists
+          if (Test-Path $devenvPath) {
+              Write-Host "devenv.exe is installed at: $devenvPath"
+          } else {
+              Write-Host "devenv.exe is NOT installed."
+              exit 1 # Exit the job if devenv is not found
+          }
+
+      - name: Build Setup Project
+        run: |
+          # Define the path to the Setup.vdproj file
+          $setupProjectPath = "${{ github.workspace }}\Setup\Setup.vdproj"
+
+          # Check if the Setup.vdproj file exists
+          if (Test-Path $setupProjectPath) {
+              Write-Host "Found Setup.vdproj at: $setupProjectPath"
+              
+              # Output the devenvPath for debugging
+              $devenvPath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.exe"
+              Write-Host "Using devenv.exe at: $devenvPath" # Debug output for devenvPath
+
+              # Build the setup project using devenv.exe
+              Start-Process -FilePath $devenvPath -ArgumentList $setupProjectPath, '/build', 'Release' -NoNewWindow -Wait
+          } else {
+              Write-Host "Setup.vdproj file not found at: $setupProjectPath"
+              exit 1 # Exit if the Setup.vdproj file is not found
+          }
+
+      - name: Upload MSI Artifact
+        run: |
+          # Define the path to the MSI file (adjust the path as necessary)
+          $msiPath = "${{ github.workspace }}\Setup\Release\Setup.msi" # Replace with the actual MSI file name
+
+          # Check if the MSI file exists
+          if (Test-Path $msiPath) {
+              Write-Host "Found MSI file at: $msiPath"
+          } else {
+              Write-Host "MSI file not found at: $msiPath"
+              exit 1 # Exit if the MSI file is not found
+          }
+          
+          # Upload the MSI file as an artifact
+          echo "::set-output name=msi-path::$msiPath"
+          
+      - name: Upload MSI to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: setup-msi
+          path: ${{ steps.upload-msi.outputs.msi-path }}
