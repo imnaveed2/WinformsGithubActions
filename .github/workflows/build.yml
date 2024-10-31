@@ -14,11 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '4.8.x'  # Specify the .NET version if needed for the build
-
       - name: Build WinformsGithubActions
         run: |
           msbuild WinformsGithubActions/WinformsGithubActions.csproj /p:Configuration=Release
