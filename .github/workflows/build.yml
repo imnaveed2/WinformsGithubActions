@@ -1,25 +1,48 @@
-name: Log MSBuild Path
+name: Build AdvanceSetup MSI
 
 on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
-  log-msbuild-path:
+  build:
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Log MSBuild Path
+      - name: Build Solution using MSBuild
         run: |
-          # Check the default MSBuild installation path for Visual Studio Enterprise
-          $msbuildPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+          # Find the solution file in the checked-out directory
+          $solutionFile = Get-ChildItem -Path . -Filter '*.sln' -Recurse | Select-Object -First 1
 
-          if (Test-Path $msbuildPath) {
-            Write-Host "MSBuild is found at: $msbuildPath"
-          } else {
-            Write-Host "MSBuild not found at the expected path."
+          # Check if a solution file was found
+          if (-not $solutionFile) {
+            Write-Error "No solution file found in the repository."
+            exit 1
           }
+
+          # Define the MSBuild path
+          $msbuildPath = 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe'
+          
+          # Confirm MSBuild exists at this path
+          if (-not (Test-Path $msbuildPath)) {
+            Write-Error "MSBuild executable not found in path: $msbuildPath"
+            exit 1
+          }
+
+          # Display information for debugging
+          Write-Output "Using MSBuild from: $msbuildPath"
+          Write-Output "Building solution: $($solutionFile.FullName)"
+          
+          # Run the build command directly using the full path
+          & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
+
+      - name: Upload AdvanceSetup.msi artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: AdvanceSetup
+          path: AdvanceSetup/AdvanceSetup-SetupFiles/AdvanceSetup.msi
