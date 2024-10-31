@@ -20,22 +20,26 @@ jobs:
       - name: Build MSI using Advanced Installer
         shell: pwsh
         run: |
-          # Define the direct path to AdvancedInstaller.com
-          $advancedInstallerPath = 'C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86\AdvancedInstaller.com'
+          # Define the direct path to advinst.exe
+          $advinstPath = 'C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86\advinst.exe'
+          $aipPath = "${{ github.workspace }}\AdvanceSetup\AdvanceSetup.aip"
           
-          # Confirm AdvancedInstaller.com exists at this path
-          if (-not (Test-Path $advancedInstallerPath)) {
-            Write-Error "AdvancedInstaller.com executable not found in path: $advancedInstallerPath"
+          # Confirm advinst.exe exists at this path
+          if (-not (Test-Path $advinstPath)) {
+            Write-Error "advinst.exe executable not found in path: $advinstPath"
             exit 1
           }
 
+          # Log the full path to AdvanceSetup.aip
+          Write-Output "Path to AdvanceSetup.aip: $aipPath"
+          
           # Display contents of the Advanced Installer directory for debugging
           Write-Output "Contents of Advanced Installer directory:"
           Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86" | Write-Output
 
-          # Run the build command directly using the full path
-          Write-Output "Using AdvancedInstaller.com from: $advancedInstallerPath"
-          & "$advancedInstallerPath" /build AdvanceSetup/AdvanceSetup.aip
+          # Run the build command directly using the full path to advinst.exe
+          Write-Output "Using advinst.exe from: $advinstPath"
+          & "$advinstPath" /build $aipPath
 
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
