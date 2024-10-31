@@ -14,6 +14,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '4.8.x'  # Specify the .NET version if needed for the build
+
+      - name: Build WinformsGithubActions
+        run: |
+          msbuild WinformsGithubActions/WinformsGithubActions.csproj /p:Configuration=Release
+
       - name: Install Advanced Installer
         run: choco install advanced-installer --version=22.1 --yes
 
@@ -22,6 +31,7 @@ jobs:
         run: |
           # Define the direct path to AdvancedInstaller.com
           $advancedInstallerPath = 'C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86\AdvancedInstaller.com'
+          $aipPath = "${{ github.workspace }}\AdvanceSetup\AdvanceSetup.aip"
           
           # Confirm AdvancedInstaller.com exists at this path
           if (-not (Test-Path $advancedInstallerPath)) {
@@ -29,13 +39,16 @@ jobs:
             exit 1
           }
 
+          # Log the full path to AdvanceSetup.aip
+          Write-Output "Path to AdvanceSetup.aip: $aipPath"
+          
           # Display contents of the Advanced Installer directory for debugging
           Write-Output "Contents of Advanced Installer directory:"
           Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86" | Write-Output
 
           # Run the build command directly using the full path
           Write-Output "Using AdvancedInstaller.com from: $advancedInstallerPath"
-          & "$advancedInstallerPath" /build ${{ github.workspace }}\AdvanceSetup\AdvanceSetup.aip
+          & "$advancedInstallerPath" /build $aipPath
 
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
