@@ -14,6 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install Advanced Installer
+        run: choco install advanced-installer --version=22.1 --yes
+
       - name: Build Solution using MSBuild
         run: |
           # Find the solution file in the checked-out directory
