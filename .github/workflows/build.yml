@@ -14,10 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install MSBuild Tools
-        run: |
-          choco install visualstudio2019buildtools --yes
-
       - name: Build Solution using MSBuild
         run: |
           # Find the solution file in the checked-out directory
