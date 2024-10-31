@@ -35,7 +35,7 @@ jobs:
 
           # Run the build command directly using the full path
           Write-Output "Using AdvancedInstaller.com from: $advancedInstallerPath"
-          & "$advancedInstallerPath" /build AdvanceSetup/AdvanceSetup.aip
+          & "$advancedInstallerPath" /build ${{ github.workspace }}\AdvanceSetup\AdvanceSetup.aip
 
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
