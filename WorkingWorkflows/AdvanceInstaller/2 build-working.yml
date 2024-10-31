@@ -1,0 +1,51 @@
+name: Build AdvanceSetup MSI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Advanced Installer
+        run: choco install advanced-installer --version=22.1 --yes
+
+      - name: Build Solution using MSBuild
+        run: |
+          # Find the solution file in the checked-out directory
+          $solutionFile = Get-ChildItem -Path . -Filter '*.sln' -Recurse | Select-Object -First 1
+
+          # Check if a solution file was found
+          if (-not $solutionFile) {
+            Write-Error "No solution file found in the repository."
+            exit 1
+          }
+
+          # Define the MSBuild path
+          $msbuildPath = 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe'
+          
+          # Confirm MSBuild exists at this path
+          if (-not (Test-Path $msbuildPath)) {
+            Write-Error "MSBuild executable not found in path: $msbuildPath"
+            exit 1
+          }
+
+          # Display information for debugging
+          Write-Output "Using MSBuild from: $msbuildPath"
+          Write-Output "Building solution: $($solutionFile.FullName)"
+          
+          # Run the build command directly using the full path
+          & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
+
+      - name: Upload AdvanceSetup.msi artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: AdvanceSetup
+          path: AdvanceSetup/AdvanceSetup-SetupFiles/AdvanceSetup.msi
