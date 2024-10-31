@@ -17,18 +17,6 @@ jobs:
       - name: Install Advanced Installer
         run: choco install advanced-installer --version=22.1 --yes
 
-      - name: Log Release Folder Contents
-        shell: pwsh
-        run: |
-          Write-Output "Contents of WinformsGithubActions\\WinformsGithubActions\\bin\\Release:"
-          Get-ChildItem -Path WinformsGithubActions/WinformsGithubActions/bin/Release | Write-Output
-
-      - name: Log Debug Folder Contents
-        shell: pwsh
-        run: |
-          Write-Output "Contents of WinformsGithubActions\\WinformsGithubActions\\bin\\Debug:"
-          Get-ChildItem -Path WinformsGithubActions/WinformsGithubActions/bin/Debug | Write-Output
-
       - name: Build MSI using Advanced Installer
         shell: pwsh
         run: |
@@ -46,7 +34,6 @@ jobs:
           # Run the build command directly using the full path
           Write-Output "Using AdvancedInstaller.com from: $advancedInstallerPath"
           & "$advancedInstallerPath" /build AdvanceSetup/AdvanceSetup.aip
-          
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
         with:
