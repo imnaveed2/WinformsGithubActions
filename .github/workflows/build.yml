@@ -14,26 +14,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Advanced Installer
-        run: choco install advanced-installer --version=22.1 --yes
-
-      - name: Build MSI using Advanced Installer
-        shell: pwsh
+      - name: Install MSBuild Tools
         run: |
-          # Define the direct path to AdvancedInstaller.com
-          $advancedInstallerPath = 'C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86\AdvancedInstaller.com'
-          
-          # Confirm AdvancedInstaller.com exists at this path
-          if (-not (Test-Path $advancedInstallerPath)) {
-            Write-Error "AdvancedInstaller.com executable not found in path: $advancedInstallerPath"
+          choco install visualstudio2019buildtools --yes
+
+      - name: Build Solution using MSBuild
+        run: |
+          # Find the solution file in the checked-out directory
+          $solutionFile = Get-ChildItem -Path . -Filter '*.sln' -Recurse | Select-Object -First 1
+
+          # Check if a solution file was found
+          if (-not $solutionFile) {
+            Write-Error "No solution file found in the repository."
             exit 1
           }
-          # Display contents of the Advanced Installer directory for debugging
-          Write-Output "Contents of Advanced Installer directory:"
-          Get-ChildItem "C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86" | Write-Output
+
+          # Define the MSBuild path
+          $msbuildPath = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe'
+          
+          # Confirm MSBuild exists at this path
+          if (-not (Test-Path $msbuildPath)) {
+            Write-Error "MSBuild executable not found in path: $msbuildPath"
+            exit 1
+          }
+
+          # Display information for debugging
+          Write-Output "Using MSBuild from: $msbuildPath"
+          Write-Output "Building solution: $($solutionFile.FullName)"
+          
           # Run the build command directly using the full path
-          Write-Output "Using AdvancedInstaller.com from: $advancedInstallerPath"
-          & "$advancedInstallerPath" /build AdvanceSetup/AdvanceSetup.aip
+          & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
+
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
         with:
