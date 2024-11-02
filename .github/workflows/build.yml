@@ -3,7 +3,7 @@ name: Build AdvanceSetup MSI
 on:
   push:
     branches:
-      - main
+      - orca
   pull_request:
 
 jobs:
@@ -43,6 +43,14 @@ jobs:
           
           # Run the build command directly using the full path
           & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
+
+      - name: Set Property in MSI using Advanced Installer
+        run: |
+          $msiPath = "AdvanceSetup/AdvanceSetup-SetupFiles/AdvanceSetup.msi"
+          $advancedInstallerPath = "C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86\AdvancedInstaller.com"
+
+          # Set the property in the MSI file using Advanced Installer command
+          & "$advancedInstallerPath" /edit "$msiPath" /SetProperty "DISABLEADVTSHORTCUTS=1"
 
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
