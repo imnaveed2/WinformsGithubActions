@@ -44,21 +44,23 @@ jobs:
           # Run the build command directly using the full path
           & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
 
-      - name: Verify WinformsGithubActions.exe exists
-        run: |
-          $exePath = "path\to\WinformsGithubActions.exe"
-          if (-Not (Test-Path $exePath)) {
-            Write-Error "WinformsGithubActions.exe not found at path: $exePath"
-            exit 1
-          }
-
-      - name: Set Property in MSI using Advanced Installer
+      - name: Modify MSI Property
         run: |
           $msiPath = "AdvanceSetup/AdvanceSetup-SetupFiles/AdvanceSetup.msi"
-          $advancedInstallerPath = "C:\Program Files (x86)\Caphyon\Advanced Installer 22.1\bin\x86\AdvancedInstaller.com"
+          $scriptPath = "ModifyMSIProperty.vbs"
 
-          # Set the property in the MSI file using Advanced Installer command
-          & "$advancedInstallerPath" /edit "$msiPath" /SetProperty "DISABLEADVTSHORTCUTS=1"
+          # Create the VBScript file
+          Set-Content -Path $scriptPath -Value @"
+Set o_installer = CreateObject("WindowsInstaller.Installer")
+Set o_database = o_installer.OpenDatabase("$msiPath", 1)
+s_SQL = "INSERT INTO Property (Property, Value) Values('DISABLEADVTSHORTCUTS', '1')"
+Set o_MSIView = o_database.OpenView(s_SQL)
+o_MSIView.Execute
+o_database.Commit
+"@
+
+          # Run the VBScript
+          cscript //NoLogo $scriptPath $msiPath
 
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
