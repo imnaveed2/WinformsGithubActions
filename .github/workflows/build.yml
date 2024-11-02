@@ -17,6 +17,9 @@ jobs:
       - name: Install Advanced Installer
         run: choco install advanced-installer --version=22.1 --yes
 
+      - name: Install Orca
+        run: choco install orca --yes
+
       - name: Build Solution using MSBuild
         run: |
           # Find the solution file in the checked-out directory
@@ -43,6 +46,44 @@ jobs:
           
           # Run the build command directly using the full path
           & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
+
+      - name: Edit MSI with Orca
+        run: |
+          $msiPath = "AdvanceSetup/AdvanceSetup-SetupFiles/AdvanceSetup.msi"
+          # Create a new Orca script to add the property
+          $orcaScript = @"
+          ' This script will add a new property to the MSI
+          Dim db
+          Set db = Session.Database
+          
+          Dim view
+          Set view = db.OpenView("SELECT * FROM Property")
+          view.Execute
+          
+          Dim record
+          Set record = view.Fetch
+          
+          ' Add DISABLEADVTSHORTCUTS property
+          Dim propertyName
+          propertyName = "DISABLEADVTSHORTCUTS"
+          
+          Set record = db.NewRecord("Property")
+          record.StringData(1) = propertyName
+          record.StringData(2) = "1"
+          view.Modify(MsiViewModify.msiViewModifyInsert, record)
+          
+          view.Close
+          "@
+          
+          # Save the script to a temporary file
+          $tempScriptPath = "add_property.vbs"
+          $orcaScript | Set-Content -Path $tempScriptPath
+
+          # Run the Orca command to edit the MSI
+          Start-Process orca.exe -ArgumentList @("/s", $msiPath, $tempScriptPath) -NoNewWindow -Wait
+          
+          # Clean up the temporary script file
+          Remove-Item -Path $tempScriptPath -Force
 
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
