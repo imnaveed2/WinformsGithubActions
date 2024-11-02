@@ -44,6 +44,14 @@ jobs:
           # Run the build command directly using the full path
           & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
 
+      - name: Verify WinformsGithubActions.exe exists
+        run: |
+          $exePath = "path\to\WinformsGithubActions.exe"
+          if (-Not (Test-Path $exePath)) {
+            Write-Error "WinformsGithubActions.exe not found at path: $exePath"
+            exit 1
+          }
+
       - name: Set Property in MSI using Advanced Installer
         run: |
           $msiPath = "AdvanceSetup/AdvanceSetup-SetupFiles/AdvanceSetup.msi"
