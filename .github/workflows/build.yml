@@ -50,7 +50,7 @@ jobs:
           $scriptPath = "ModifyMSIProperty.vbs"
 
           # Create the VBScript file
-          Set-Content -Path $scriptPath -Value @"
+          $vbscriptContent = @"
 Set o_installer = CreateObject("WindowsInstaller.Installer")
 Set o_database = o_installer.OpenDatabase("$msiPath", 1)
 s_SQL = "INSERT INTO Property (Property, Value) Values('DISABLEADVTSHORTCUTS', '1')"
@@ -58,6 +58,8 @@ Set o_MSIView = o_database.OpenView(s_SQL)
 o_MSIView.Execute
 o_database.Commit
 "@
+
+          Set-Content -Path $scriptPath -Value $vbscriptContent
 
           # Run the VBScript
           cscript //NoLogo $scriptPath $msiPath
