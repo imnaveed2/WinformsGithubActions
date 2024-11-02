@@ -44,26 +44,6 @@ jobs:
           # Run the build command directly using the full path
           & "$msbuildPath" $solutionFile.FullName /p:Configuration=Release
 
-      - name: Modify MSI Property
-        run: |
-          $msiPath = "AdvanceSetup/AdvanceSetup-SetupFiles/AdvanceSetup.msi"
-          $scriptPath = "ModifyMSIProperty.vbs"
-
-          # Create the VBScript file
-          $vbscriptContent = @"
-Set o_installer = CreateObject("WindowsInstaller.Installer")
-Set o_database = o_installer.OpenDatabase("$msiPath", 1)
-s_SQL = "INSERT INTO Property (Property, Value) Values('DISABLEADVTSHORTCUTS', '1')"
-Set o_MSIView = o_database.OpenView(s_SQL)
-o_MSIView.Execute
-o_database.Commit
-"@
-
-          Set-Content -Path $scriptPath -Value $vbscriptContent
-
-          # Run the VBScript
-          cscript //NoLogo $scriptPath $msiPath
-
       - name: Upload AdvanceSetup.msi artifact
         uses: actions/upload-artifact@v3
         with:
