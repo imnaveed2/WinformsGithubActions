@@ -3,7 +3,7 @@ name: Build AdvanceSetup MSI
 on:
   push:
     branches:
-      - orca
+      - main
   pull_request:
 
 jobs:
